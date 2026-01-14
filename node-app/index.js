@@ -74,6 +74,9 @@ function generatePDF(name, res) {
 
 // API endpoint to generate a name
 app.get('/api/generate', (req, res) => {
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'healthy', timestamp: new Date().toISOString() });
+});
   try {
     const name = generateLeprechaunName();
     res.json({ name });
