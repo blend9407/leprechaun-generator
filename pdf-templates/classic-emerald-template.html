@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classic Emerald Certificate Template</title>
+    <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Irish+Grover&family=Open+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        @page {
+            size: A4;
+            margin: 25mm;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            background: #F5F5DC; /* Parchment */
+            font-family: 'Open Sans', sans-serif;
+            color: #36454F;
+            width: 210mm;
+            height: 297mm;
+            position: relative;
+            box-sizing: border-box;
+        }
+        
+        .certificate {
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(rgba(245, 245, 220, 0.9), rgba(245, 245, 220, 0.9)),
+                url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M20,50 Q50,20 80,50 Q50,80 20,50" fill="none" stroke="%232E8B57" stroke-width="0.5" opacity="0.1"/></svg>');
+            position: relative;
+            border: 15px solid transparent;
+            border-image: linear-gradient(45deg, #2E8B57, #006400, #2E8B57) 1;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .border-decoration {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        
+        .celtic-corner {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background: #2E8B57;
+            clip-path: polygon(0 0, 100% 0, 100% 30%, 70% 30%, 70% 70%, 30% 70%, 30% 30%, 0 30%);
+            opacity: 0.3;
+        }
+        
+        .top-left { top: 10px; left: 10px; }
+        .top-right { top: 10px; right: 10px; transform: rotate(90deg); }
+        .bottom-left { bottom: 10px; left: 10px; transform: rotate(270deg); }
+        .bottom-right { bottom: 10px; right: 10px; transform: rotate(180deg); }
+        
+        .content {
+            padding: 40px;
+            text-align: center;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .header-icon {
+            font-size: 60px;
+            color: #FFD700;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 0 #006400;
+        }
+        
+        h1 {
+            font-family: 'Luckiest Guy', cursive;
+            font-size: 48px;
+            color: #FFD700;
+            text-shadow: 3px 3px 0 #006400;
+            margin: 0 0 10px 0;
+            letter-spacing: 1px;
+        }
+        
+        .subtitle {
+            font-family: 'Irish Grover', cursive;
+            font-size: 24px;
+            color: #2E8B57;
+            margin-bottom: 40px;
+            font-weight: normal;
+        }
+        
+        .name-display {
+            background: linear-gradient(135deg, #2E8B57, #006400);
+            color: white;
+            padding: 30px 60px;
+            border-radius: 15px;
+            margin: 30px 0;
+            border: 5px solid #FFD700;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .generated-name {
+            font-family: 'Irish Grover', cursive;
+            font-size: 60px;
+            margin: 0;
+            line-height: 1.2;
+        }
+        
+        .meaning {
+            font-size: 20px;
+            color: #006400;
+            font-style: italic;
+            margin: 20px 0 40px 0;
+            max-width: 600px;
+        }
+        
+        .separator {
+            width: 80%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #FFD700, #2E8B57, #FFD700, transparent);
+            margin: 30px auto;
+        }
+        
+        .details {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            margin-top: 30px;
+        }
+        
+        .detail-item {
+            text-align: center;
+        }
+        
+        .detail-label {
+            font-weight: bold;
+            color: #2E8B57;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+        
+        .detail-value {
+            font-size: 18px;
+            color: #36454F;
+        }
+        
+        .footer {
+            margin-top: 40px;
+            font-size: 14px;
+            color: #808080;
+            max-width: 600px;
+            line-height: 1.5;
+        }
+        
+        .shamrock {
+            display: inline-block;
+            color: #228B22;
+            font-size: 20px;
+            margin: 0 5px;
+        }
+        
+        @media print {
+            body {
+                background: white;
+            }
+            
+            .certificate {
+                border: none;
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="certificate">
+        <div class="border-decoration">
+            <div class="celtic-corner top-left"></div>
+            <div class="celtic-corner top-right"></div>
+            <div class="celtic-corner bottom-left"></div>
+            <div class="celtic-corner bottom-right"></div>
+        </div>
+        
+        <div class="content">
+            <div class="header-icon">🎩</div>
+            
+            <h1>OFFICIAL LEPRECHAUN NAME CERTIFICATE</h1>
+            <div class="subtitle">Certificate of Magical Identity</div>
+            
+            <div class="name-display">
+                <h2 class="generated-name">FINNIGAN O'SHAMROCK</h2>
+            </div>
+            
+            <div class="meaning">
+                "Brave guardian of the four-leaf clover, keeper of rainbow's end"
+            </div>
+            
+            <div class="separator"></div>
+            
+            <div class="details">
+                <div class="detail-item">
+                    <div class="detail-label">ISSUED TO</div>
+                    <div class="detail-value">John Smith</div>
+                </div>
+                
+                <div class="detail-item">
+                    <div class="detail-label">DATE OF ISSUE</div>
+                    <div class="detail-value">March 17, 2024</div>
+                </div>
+                
+                <div class="detail-item">
+                    <div class="detail-label">CERTIFICATE #</div>
+                    <div class="detail-value">LN-2024-001</div>
+                </div>
+            </div>
+            
+            <div class="footer">
+                <span class="shamrock">☘️</span>
+                This certifies that <strong>John Smith</strong> possesses the magical qualities 
+                of a true leprechaun, including exceptional luck, mischievous charm, 
+                and guardianship of hidden treasure.
+                <span class="shamrock">☘️</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,205 @@
+import os
+import json
+import secrets
+import re
+from datetime import datetime
+from flask import Flask, request, jsonify, send_file, render_template_string
+from flask_cors import CORS
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+from weasyprint import HTML
+import tempfile
+
+app = Flask(__name__, static_folder='.', static_url_path='')
+CORS(app)
+
+# Security headers middleware
+@app.after_request
+def add_security_headers(response):
+    response.headers['Content-Security-Policy'] = "default-src 'self'; script-src 'self' 'unsafe-inline' https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:;"
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-Frame-Options'] = 'DENY'
+    response.headers['X-XSS-Protection'] = '1; mode=block'
+    response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+    # HSTS would be added in production with SSL
+    # response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+    return response
+
+# Rate limiting
+limiter = Limiter(
+    app=app,
+    key_func=get_remote_address,
+    default_limits=["100 per hour", "20 per minute"]
+)
+
+# Database file
+DB_FILE = 'names.json'
+
+# Initialize database if not exists
+if not os.path.exists(DB_FILE):
+    with open(DB_FILE, 'w') as f:
+        json.dump([], f)
+
+# Allowed templates for PDF generation
+ALLOWED_TEMPLATES = ['classic-emerald', 'pot-of-gold', 'rainbow-magic']
+
+# Input validation regex
+NAME_REGEX = re.compile(r'^[a-zA-Z\s\-\']{1,50}$')
+
+# Health endpoint
+@app.route("/health", methods=["GET"])
+def health_check():
+    return jsonify({
+        "status": "healthy",
+        "service": "leprechaun-name-generator",
+        "timestamp": datetime.now().isoformat(),
+        "security": "hardened-v1.0"
+    }), 200
+
+# Serve index.html
+@app.route("/")
+def index():
+    return app.send_static_file('index.html')
+
+# Name generation endpoint with rate limiting
+@app.route("/api/generate-name", methods=["POST"])
+@limiter.limit("10 per minute")
+def generate_name():
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({"success": False, "error": "Invalid JSON"}), 400
+        
+        first_name = data.get('first_name', '').strip()
+        last_name = data.get('last_name', '').strip()
+        method = data.get('method', 'traditional')
+        
+        # Input validation
+        if not first_name or not last_name:
+            return jsonify({"success": False, "error": "First and last name required"}), 400
+        
+        if not NAME_REGEX.match(first_name) or not NAME_REGEX.match(last_name):
+            return jsonify({"success": False, "error": "Names can only contain letters, spaces, hyphens, and apostrophes"}), 400
+        
+        if method not in ['traditional', 'modern', 'whimsical']:
+            method = 'traditional'
+        
+        # Irish first names
+        irish_first = ["Aidan", "Brendan", "Cillian", "Darragh", "Eoin", "Finn", "Gearoid", "Liam", "Niall", "Oisin", "Padraig", "Ronan", "Sean", "Tadhg", "Cormac"]
+        
+        # Irish last names with prefixes
+        irish_prefixes = ["Mc", "O'", "Mac", "Fitz"]
+        irish_roots = ["Gleeson", "Murphy", "Kelly", "O'Brien", "Ryan", "Sullivan", "Walsh", "McCarthy", "O'Connor", "Doyle", "Kennedy", "Lynch", "Moore", "Reilly", "Brennan"]
+        
+        # Generate leprechaun name using secrets for cryptographically secure random
+        if method == "traditional":
+            leprechaun_first = secrets.choice(irish_first)
+            leprechaun_last = secrets.choice(irish_prefixes) + secrets.choice(irish_roots)
+        elif method == "modern":
+            leprechaun_first = secrets.choice(["Finn", "Riley", "Quinn", "Casey", "Dylan"])
+            leprechaun_last = secrets.choice(["Green", "Gold", "Rainbow", "Clover", "Shamrock"])
+        else:
+            leprechaun_first = secrets.choice(irish_first)
+            leprechaun_last = secrets.choice(irish_roots)
+        
+        leprechaun_name = f"{leprechaun_first} {leprechaun_last}"
+        
+        # Meanings
+        meanings = [
+            "Keeper of the rainbow's end",
+            "Guardian of hidden treasures",
+            "Weaver of golden dreams",
+            "Master of four-leaf clovers",
+            "Protector of ancient magic",
+            "Craftsman of enchanted shoes",
+            "Watcher of the emerald hills",
+            "Keeper of the pot of gold"
+        ]
+        meaning = secrets.choice(meanings)
+        
+        # Save to database
+        with open(DB_FILE, 'r') as f:
+            names = json.load(f)
+        
+        entry = {
+            "id": len(names) + 1,
+            "real_name": f"{first_name} {last_name}",
+            "leprechaun_name": leprechaun_name,
+            "meaning": meaning,
+            "method": method,
+            "timestamp": datetime.now().isoformat(),
+            "ip": request.remote_addr
+        }
+        names.append(entry)
+        
+        with open(DB_FILE, 'w') as f:
+            json.dump(names, f, indent=2)
+        
+        return jsonify({
+            "success": True,
+            "leprechaun_name": leprechaun_name,
+            "meaning": meaning,
+            "method": method,
+            "real_name": f"{first_name} {last_name}"
+        })
+    
+    except Exception as e:
+        app.logger.error(f"Error in generate_name: {str(e)}")
+        return jsonify({"success": False, "error": "Internal server error"}), 500
+
+# PDF generation endpoint with path traversal protection
+@app.route("/api/generate-pdf", methods=["POST"])
+@limiter.limit("5 per minute")
+def generate_pdf():
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({"success": False, "error": "Invalid JSON"}), 400
+        
+        leprechaun_name = data.get('leprechaun_name', 'Unknown Leprechaun')
+        meaning = data.get('meaning', 'Guardian of hidden treasures')
+        template = data.get('template', 'classic-emerald')
+        
+        # Validate template to prevent path traversal
+        if template not in ALLOWED_TEMPLATES:
+            template = 'classic-emerald'
+        
+        # Sanitize inputs for HTML safety
+        leprechaun_name = leprechaun_name.replace('<', '&lt;').replace('>', '&gt;')
+        meaning = meaning.replace('<', '&lt;').replace('>', '&gt;')
+        
+        # Load template safely
+        template_file = f"pdf-templates/{template}-template.html"
+        
+        # Additional security check
+        if not os.path.exists(template_file):
+            return jsonify({"success": False, "error": "Template not found"}), 404
+        
+        with open(template_file, 'r') as f:
+            html_content = f.read()
+        
+        # Replace placeholders with sanitized values
+        html_content = html_content.replace('{{leprechaun_name}}', leprechaun_name)
+        html_content = html_content.replace('{{meaning}}', meaning)
+        html_content = html_content.replace('{{date}}', datetime.now().strftime('%B %d, %Y'))
+        
+        # Generate PDF
+        with tempfile.NamedTemporaryFile(suffix='.pdf', delete=False) as tmp:
+            pdf_path = tmp.name
+        
+        HTML(string=html_content).write_pdf(pdf_path)
+        
+        return send_file(
+            pdf_path,
+            as_attachment=True,
+            download_name=f"leprechaun-certificate-{datetime.now().strftime('%Y%m%d')}.pdf",
+            mimetype='application/pdf'
+        )
+    
+    except Exception as e:
+        app.logger.error(f"Error in generate_pdf: {str(e)}")
+        return jsonify({"success": False, "error": "Internal server error"}), 500
+
+if __name__ == '__main__':
+    # Security: Disable debug mode, bind to localhost only
+    app.run(host='127.0.0.1', port=5000, debug=False)

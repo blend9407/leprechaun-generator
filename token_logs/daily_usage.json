@@ -1,0 +1,16 @@
+{
+  "total_spent": 0.0009599999999999999,
+  "total_tokens": 48,
+  "daily_breakdown": {
+    "2026-01-13": {
+      "cost": 0.0009599999999999999,
+      "tokens": 48
+    }
+  },
+  "category_breakdown": {
+    "development": 0.0004,
+    "design_ui": 0.00026000000000000003,
+    "testing_security": 0.0,
+    "marketing_deployment": 0.0003
+  }
+}

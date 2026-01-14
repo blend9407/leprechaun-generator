@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Leprechaun Generator Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        button { padding: 10px 20px; background: #2E8B57; color: white; border: none; cursor: pointer; }
+        .result { margin-top: 20px; padding: 15px; border: 1px solid #ccc; }
+    </style>
+</head>
+<body>
+    <h1>Integration Test</h1>
+    <button onclick="testAPI()">Test API Integration</button>
+    <div id="result" class="result"></div>
+    
+    <script>
+    async function testAPI() {
+        const resultDiv = document.getElementById('result');
+        resultDiv.innerHTML = 'Testing...';
+        
+        try {
+            // Test health endpoint
+            const healthRes = await fetch('/health');
+            const healthData = await healthRes.json();
+            
+            // Test name generation
+            const nameRes = await fetch('/api/generate-name', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    first_name: 'Integration',
+                    last_name: 'Test',
+                    method: 'traditional'
+                })
+            });
+            const nameData = await nameRes.json();
+            
+            resultDiv.innerHTML = `
+                <h3>✓ API Integration Successful</h3>
+                <p><strong>Health Status:</strong> ${healthData.status}</p>
+                <p><strong>Generated Name:</strong> ${nameData.leprechaun_name}</p>
+                <p><strong>Meaning:</strong> ${nameData.meaning}</p>
+                <p><strong>Backend:</strong> Flask server running</p>
+                <p><strong>Access:</strong> <a href="/">Go to main interface</a></p>
+            `;
+        } catch (error) {
+            resultDiv.innerHTML = `
+                <h3>✗ API Integration Failed</h3>
+                <p><strong>Error:</strong> ${error.message}</p>
+                <p>Check if Flask server is running on port 5000</p>
+            `;
+        }
+    }
+    </script>
+</body>
+</html>

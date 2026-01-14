@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leprechaun Name Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Open+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* Design System Implementation */
+        :root {
+            --emerald-green: #2E8B57;
+            --gold: #FFD700;
+            --dark-green: #006400;
+            --clover-green: #228B22;
+            --pot-gold-yellow: #F0E68C;
+            --irish-sky-blue: #87CEEB;
+            --shamrock-green: #009E60;
+            --charcoal: #36454F;
+            --stone-gray: #808080;
+            --cloud-white: #FFFFFF;
+            --parchment: #F5F5DC;
+            
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+            --spacing-xxl: 48px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background: linear-gradient(135deg, var(--irish-sky-blue) 0%, var(--cloud-white) 100%);
+            color: var(--charcoal);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: var(--spacing-md);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        /* Header */
+        header {
+            text-align: center;
+            padding: var(--spacing-xl) 0;
+            background: linear-gradient(135deg, var(--emerald-green), var(--dark-green));
+            border-radius: 20px;
+            margin-bottom: var(--spacing-xl);
+            box-shadow: 0 8px 16px rgba(46, 139, 87, 0.2);
+            border: 4px solid var(--gold);
+        }
+        
+        h1 {
+            font-family: 'Luckiest Guy', cursive;
+            font-size: 2.5rem;
+            color: var(--gold);
+            text-shadow: 3px 3px 0 var(--dark-green);
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .tagline {
+            font-size: 1.2rem;
+            color: var(--cloud-white);
+            font-weight: 500;
+        }
+        
+        /* Main Generator Section */
+        .generator-section {
+            background: var(--cloud-white);
+            border-radius: 20px;
+            padding: var(--spacing-xl);
+            margin-bottom: var(--spacing-xl);
+            box-shadow: 0 4px 12px rgba(46, 139, 87, 0.15);
+            border: 2px solid var(--emerald-green);
+        }
+        
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        label {
+            font-weight: 700;
+            color: var(--dark-green);
+            font-size: 1.1rem;
+        }
+        
+        input, select {
+            padding: var(--spacing-md);
+            border: 2px solid #C8E6C9;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-family: 'Open Sans', sans-serif;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--emerald-green);
+            box-shadow: 0 0 0 3px rgba(46, 139, 87, 0.1);
+        }
+        
+        /* Buttons */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--emerald-green), var(--dark-green));
+            color: var(--cloud-white);
+            border: 2px solid var(--gold);
+            border-radius: 25px;
+            padding: var(--spacing-md) var(--spacing-xl);
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .btn-secondary {
+            background: var(--gold);
+            color: var(--dark-green);
+            border: 2px solid var(--emerald-green);
+            border-radius: 25px;
+            padding: var(--spacing-md) var(--spacing-xl);
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        /* Result Display */
+        .result-card {
+            background: var(--parchment);
+            border-radius: 15px;
+            padding: var(--spacing-xl);
+            text-align: center;
+            border: 3px dashed var(--emerald-green);
+            margin-top: var(--spacing-xl);
+        }
+        
+        .generated-name {
+            font-family: 'Luckiest Guy', cursive;
+            font-size: 2.5rem;
+            color: var(--dark-green);
+            margin: var(--spacing-md) 0;
+        }
+        
+        /* PDF Templates Section */
+        .templates-section {
+            background: var(--cloud-white);
+            border-radius: 20px;
+            padding: var(--spacing-xl);
+            margin-bottom: var(--spacing-xl);
+            box-shadow: 0 4px 12px rgba(46, 139, 87, 0.15);
+        }
+        
+        .template-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--spacing-lg);
+            margin-top: var(--spacing-lg);
+        }
+        
+        .template-card {
+            background: var(--parchment);
+            border-radius: 12px;
+            padding: var(--spacing-lg);
+            border: 2px solid var(--pot-gold-yellow);
+            transition: transform 0.3s;
+        }
+        
+        .template-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        /* Premium Section */
+        .premium-section {
+            background: linear-gradient(135deg, var(--gold), var(--pot-gold-yellow));
+            border-radius: 20px;
+            padding: var(--spacing-xl);
+            text-align: center;
+            border: 4px solid var(--emerald-green);
+        }
+        
+        /* Responsive Design */
+        @media (min-width: 768px) {
+            .input-group {
+                flex-direction: row;
+                align-items: center;
+            }
+            
+            h1 {
+                font-size: 3.5rem;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .template-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            h1 {
+                font-size: 4rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🍀 Leprechaun Name Generator</h1>
+            <p class="tagline">Discover your magical Irish name and create beautiful PDF certificates!</p>
+        </header>
+        
+        <main class="generator-section">
+            <h2>Generate Your Leprechaun Name</h2>
+            <div class="input-group">
+                <div style="flex: 1;">
+                    <label for="firstName">First Name</label>
+                    <input type="text" id="firstName" placeholder="Enter your first name">
+                </div>
+                <div style="flex: 1;">
+                    <label for="lastName">Last Name</label>
+                    <input type="text" id="lastName" placeholder="Enter your last name">
+                </div>
+                <div style="flex: 1;">
+                    <label for="birthMonth">Birth Month</label>
+                    <select id="birthMonth">
+                        <option value="">Select month</option>
+                        <option value="january">January</option>
+                        <option value="february">February</option>
+                        <!-- All months -->
+                    </select>
+                </div>
+            </div>
+            
+            <button class="btn-primary" style="width: 100%;">✨ Generate Magical Name</button>
+            
+            <div class="result-card">
+                <h3>Your Leprechaun Name Is:</h3>
+                <div class="generated-name">Finnigan O'Shamrock</div>
+                <p>Meaning: "Brave guardian of the four-leaf clover"</p>
+                <div style="margin-top: var(--spacing-lg);">
+                    <button class="btn-secondary">📄 Download as PDF</button>
+                    <button class="btn-primary" style="margin-left: var(--spacing-md);">🎨 Customize Design</button>
+                </div>
+            </div>
+        </main>
+        
+        <section class="templates-section">
+            <h2>📚 PDF Template Designs</h2>
+            <p>Choose from our collection of magical certificate designs:</p>
+            
+            <div class="template-grid">
+                <div class="template-card">
+                    <h3>Classic Emerald</h3>
+                    <p>Elegant green and gold design with Celtic borders</p>
+                    <button class="btn-secondary" style="margin-top: var(--spacing-md);">Preview</button>
+                </div>
+                
+                <div class="template-card">
+                    <h3>Rainbow Magic</h3>
+                    <p>Colorful rainbow background with glitter effects</p>
+                    <button class="btn-secondary" style="margin-top: var(--spacing-md);">Preview</button>
+                </div>
+                
+                <div class="template-card">
+                    <h3>Pot of Gold</h3>
+                    <p>Golden certificate with coin and shamrock motifs</p>
+                    <button class="btn-secondary" style="margin-top: var(--spacing-md);">Preview</button>
+                </div>
+            </div>
+        </section>
+        
+        <section class="premium-section">
+            <h2>🌟 Go Premium!</h2>
+            <p>Unlock unlimited PDF downloads, custom designs, and premium features</p>
+            <div style="margin-top: var(--spacing-lg);">
+                <button class="btn-primary" style="font-size: 1.2rem; padding: var(--spacing-lg) var(--spacing-xxl);">
+                    🍀 Upgrade Now - $9.99/month
+                </button>
+            </div>
+            <p style="margin-top: var(--spacing-md); font-size: 0.9rem;">7-day free trial • Cancel anytime</p>
+        </section>
+    </div>
+</body>
+</html>

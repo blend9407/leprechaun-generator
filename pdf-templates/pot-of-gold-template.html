@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pot of Gold Certificate</title>
+    <style>
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(to bottom, #1a1a1a, #000);
+            color: #fff;
+            margin: 0;
+            padding: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .certificate {
+            width: 800px;
+            height: 600px;
+            background: radial-gradient(circle at center, #2a2a2a, #000);
+            border: 20px solid #ffd700;
+            border-image: linear-gradient(45deg, #ffd700, #ffed4e, #ffd700) 1;
+            padding: 50px;
+            position: relative;
+            box-shadow: 0 0 50px rgba(255, 215, 0, 0.5);
+            text-align: center;
+        }
+        .gold-border {
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            border: 10px solid transparent;
+            background: linear-gradient(45deg, #ffd700, #ffed4e, #ffd700) border-box;
+            z-index: -1;
+        }
+        h1 {
+            font-size: 48px;
+            color: #ffd700;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
+            margin-bottom: 20px;
+        }
+        h2 {
+            font-size: 36px;
+            color: #fff;
+            margin: 30px 0;
+            border-bottom: 3px solid #ffd700;
+            padding-bottom: 10px;
+            display: inline-block;
+        }
+        .content {
+            margin: 40px 0;
+        }
+        .leprechaun-name {
+            font-size: 42px;
+            color: #ffed4e;
+            font-weight: bold;
+            margin: 20px 0;
+            text-shadow: 0 0 15px rgba(255, 237, 78, 0.8);
+        }
+        .meaning {
+            font-size: 22px;
+            color: #ccc;
+            font-style: italic;
+            margin: 20px 0;
+        }
+        .real-name {
+            font-size: 24px;
+            color: #aaa;
+            margin: 20px 0;
+        }
+        .footer {
+            margin-top: 40px;
+            font-size: 18px;
+            color: #888;
+        }
+        .shamrock {
+            font-size: 60px;
+            color: #4CAF50;
+            margin: 20px;
+        }
+        .coin {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            background: radial-gradient(circle at 30% 30%, #ffd700, #b8860b);
+            border-radius: 50%;
+            margin: 0 10px;
+            box-shadow: 0 0 10px gold;
+        }
+    </style>
+</head>
+<body>
+    <div class="certificate">
+        <div class="gold-border"></div>
+        <h1>🍀 Leprechaun Name Certificate 🍀</h1>
+        <div class="shamrock">☘️</div>
+        <h2>Pot of Gold Edition</h2>
+        <div class="content">
+            <p>This certifies that</p>
+            <div class="real-name">{{ real_name }}</div>
+            <p>has been granted the magical leprechaun name:</p>
+            <div class="leprechaun-name">{{ leprechaun_name }}</div>
+            <div class="meaning">Meaning: "{{ meaning }}"</div>
+            <p>Bestowed with luck and guarded by the wee folk.</p>
+            <div>
+                <span class="coin"></span>
+                <span class="coin"></span>
+                <span class="coin"></span>
+            </div>
+        </div>
+        <div class="footer">
+            <p>Generated with magic on {{ date }} • May your path be filled with rainbows</p>
+        </div>
+    </div>
+</body>
+</html>

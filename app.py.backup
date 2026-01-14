@@ -1,0 +1,219 @@
+import os
+import json
+import random
+from datetime import datetime
+from flask import Flask, request, jsonify, send_file, render_template_string
+from flask_cors import CORS
+import subprocess
+import tempfile
+from weasyprint import HTML
+
+# Initialize Flask app
+app = Flask(__name__)
+CORS(app)
+
+# Configuration
+DATA_FILE = 'names.json'
+TEMPLATE_DIR = 'pdf-templates'
+
+# Irish name components
+IRISH_PREFIXES = ['Finn', 'Sean', 'Liam', 'Connor', 'Aidan', 'Rory', 'Declan', 'Brendan', 'Patrick', 'Shane', 'Kieran', 'Niall', 'Eoin', 'Cian', 'Tadhg', 'Darragh', 'Fionn', 'Oisin', 'Cillian', 'Eamon']
+IRISH_SUFFIXES = ['O\'Shamrock', 'McGold', 'O\'Rainbow', 'O\'Clover', 'McLucky', 'O\'Pot', 'McGleeson', 'O\'Green', 'McCharm', 'O\'Magic', 'McFinn', 'O\'Hoolihan', 'McTavish', 'O\'Reilly', 'McGuinness', 'O\'Brien', 'McCarthy', 'O\'Sullivan', 'McKenna', 'O\'Connell']
+
+MEANINGS = [
+    "Brave guardian of the four-leaf clover",
+    "Keeper of rainbow's end",
+    "Protector of hidden treasure",
+    "Master of mischievous charm",
+    "Wielder of lucky charms",
+    "Guardian of the pot of gold",
+    "Chaser of rainbows",
+    "Whisperer to shamrocks",
+    "Dancer of jigs in moonlight",
+    "Teller of tall tales",
+    "Finder of lost luck",
+    "Weaver of golden dreams",
+    "Keeper of ancient secrets",
+    "Guardian of Celtic magic",
+    "Master of leprechaun lore"
+]
+
+# Load existing names
+def load_names():
+    if os.path.exists(DATA_FILE):
+        with open(DATA_FILE, 'r') as f:
+            return json.load(f)
+    return []
+
+# Save names
+def save_names(names):
+    with open(DATA_FILE, 'w') as f:
+        json.dump(names, f, indent=2)
+
+# Track token usage
+def track_token_usage(agent='backend', task='name_generation'):
+    try:
+        # Call check_budget.py via subprocess
+        result = subprocess.run(['python3', 'check_budget.py'], capture_output=True, text=True)
+        print(f"Token tracking output: {result.stdout[:200]}")
+        return True
+    except Exception as e:
+        print(f"Token tracking error: {e}")
+        return False
+
+# Name generation algorithms
+def generate_name_random(first_name, last_name):
+    prefix = random.choice(IRISH_PREFIXES)
+    suffix = random.choice(IRISH_SUFFIXES)
+    return f"{prefix} {suffix}"
+
+def generate_name_syllable(first_name, last_name):
+    # Use syllables from first name
+    syllables = ['Finn', 'Sean', 'Liam', 'Con', 'Aid', 'Ror', 'Dec', 'Bren', 'Pat', 'Shane']
+    prefix = random.choice(syllables)
+    suffix = random.choice(IRISH_SUFFIXES)
+    return f"{prefix} {suffix}"
+
+def generate_name_alliterative(first_name, last_name):
+    # Alliteration with first letter of first name
+    if first_name:
+        letter = first_name[0].upper()
+        prefixes = [p for p in IRISH_PREFIXES if p.startswith(letter)]
+        prefix = random.choice(prefixes) if prefixes else random.choice(IRISH_PREFIXES)
+    else:
+        prefix = random.choice(IRISH_PREFIXES)
+    suffix = random.choice(IRISH_SUFFIXES)
+    return f"{prefix} {suffix}"
+
+# Main name generation
+def generate_leprechaun_name(first_name, last_name, method='random'):
+    if method == 'random':
+        name = generate_name_random(first_name, last_name)
+    elif method == 'syllable':
+        name = generate_name_syllable(first_name, last_name)
+    elif method == 'alliterative':
+        name = generate_name_alliterative(first_name, last_name)
+    else:
+        name = generate_name_random(first_name, last_name)
+    
+    meaning = random.choice(MEANINGS)
+    return name, meaning
+
+# PDF generation
+def generate_pdf(template_name, data):
+    template_path = os.path.join(TEMPLATE_DIR, f"{template_name}.html")
+    if not os.path.exists(template_path):
+        return None
+    
+    with open(template_path, 'r') as f:
+        html_content = f.read()
+    
+    # Replace placeholders
+    replacements = {
+        'FINNIGAN O\'SHAMROCK': data['leprechaun_name'],
+        'John Smith': data['real_name'],
+        'March 17, 2024': datetime.now().strftime('%B %d, %Y'),
+        'LN-2024-001': f"LN-{datetime.now().strftime('%Y-%m-%d')}-{random.randint(100,999)}",
+        'Brave guardian of the four-leaf clover, keeper of rainbow\'s end': data['meaning']
+    }
+    
+    for placeholder, value in replacements.items():
+        html_content = html_content.replace(placeholder, value)
+    
+    # Create PDF
+    pdf_file = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
+    pdf_path = pdf_file.name
+    pdf_file.close()
+    
+    HTML(string=html_content).write_pdf(pdf_path)
+    return pdf_path
+
+# Routes
+@app.route('/')
+def index():
+    # Serve the frontend HTML
+    frontend_path = 'index.html'
+    if os.path.exists(frontend_path):
+        with open(frontend_path, 'r') as f:
+            html = f.read()
+        return html
+    else:
+        # Fallback to mockup
+        mockup_path = 'mockups/generator-mockup.html'
+        if os.path.exists(mockup_path):
+            with open(mockup_path, 'r') as f:
+                html = f.read()
+            return html
+        else:
+            return 'Frontend not found', 404
+
+@app.route('/api/generate-name', methods=['POST'])
+def api_generate_name():
+    data = request.json
+    first_name = data.get('first_name', '').strip()
+    last_name = data.get('last_name', '').strip()
+    method = data.get('method', 'random')
+    
+    # Track token usage
+    track_token_usage(agent='backend', task='name_generation')
+    
+    # Generate name
+    leprechaun_name, meaning = generate_leprechaun_name(first_name, last_name, method)
+    real_name = f"{first_name} {last_name}".strip() if first_name or last_name else 'Anonymous'
+    
+    # Save to database
+    entry = {
+        'id': len(load_names()) + 1,
+        'timestamp': datetime.now().isoformat(),
+        'real_name': real_name,
+        'leprechaun_name': leprechaun_name,
+        'meaning': meaning,
+        'method': method
+    }
+    names = load_names()
+    names.append(entry)
+    save_names(names)
+    
+    return jsonify({
+        'success': True,
+        'leprechaun_name': leprechaun_name,
+        'meaning': meaning,
+        'real_name': real_name,
+        'method': method
+    })
+
+@app.route('/api/generate-pdf', methods=['POST'])
+def api_generate_pdf():
+    data = request.json
+    template = data.get('template', 'classic-emerald')
+    leprechaun_name = data.get('leprechaun_name', 'Finnigan O\'Shamrock')
+    real_name = data.get('real_name', 'John Smith')
+    meaning = data.get('meaning', 'Brave guardian of the four-leaf clover')
+    
+    # Track token usage
+    track_token_usage(agent='backend', task='pdf_generation')
+    
+    pdf_data = {
+        'leprechaun_name': leprechaun_name,
+        'real_name': real_name,
+        'meaning': meaning
+    }
+    
+    pdf_path = generate_pdf(template, pdf_data)
+    if pdf_path:
+        return send_file(pdf_path, as_attachment=True, download_name=f"leprechaun-certificate-{datetime.now().strftime('%Y%m%d')}.pdf")
+    else:
+        return jsonify({'success': False, 'error': 'Template not found'}), 404
+
+@app.route('/api/names', methods=['GET'])
+def api_get_names():
+    names = load_names()
+    return jsonify({'success': True, 'names': names})
+
+if __name__ == '__main__':
+    # Ensure data file exists
+    if not os.path.exists(DATA_FILE):
+        save_names([])
+    
+    print("Starting Leprechaun Name Generator backend on http://localhost:5000")
+    app.run(debug=True, host='0.0.0.0', port=5000)
