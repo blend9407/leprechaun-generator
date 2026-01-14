@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leprechaun Name Generator | Magical Irish Names</title>
+    <meta name="description" content="Generate unique leprechaun names and download beautiful PDF certificates.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary-green: #2e8b57; --secondary-gold: #ffd700; --accent-emerald: #50c878; }
+        body { font-family: 'Poppins', sans-serif; background: linear-gradient(135deg, #f0fff0 0%, #e6f7e6 100%); }
+        .font-playfair { font-family: 'Playfair Display', serif; }
+        .btn-primary { background: linear-gradient(135deg, var(--primary-green) 0%, var(--accent-emerald) 100%); color: white; padding: 12px 28px; border-radius: 50px; font-weight: 600; transition: all 0.3s ease; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(46, 139, 87, 0.4); }
+        .name-display { background: white; border: 2px dashed var(--primary-green); border-radius: 15px; padding: 25px; margin: 20px 0; }
+        .loading-spinner { display: none; border: 3px solid #f3f3f3; border-top: 3px solid #2e8b57; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="text-gray-800">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-clover text-2xl text-green-600"></i>
+                <span class="font-playfair text-xl font-bold text-green-700">LeprechaunGen</span>
+            </div>
+            <div class="hidden md:flex space-x-6">
+                <a href="#generator" class="text-gray-700 hover:text-green-600 font-medium">Generator</a>
+                <a href="#features" class="text-gray-700 hover:text-green-600 font-medium">Features</a>
+                <a href="#templates" class="text-gray-700 hover:text-green-600 font-medium">Templates</a>
+            </div>
+            <button onclick="scrollToGenerator()" class="btn-primary">Get Started</button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="py-16 md:py-24 px-4 text-center">
+        <div class="container mx-auto">
+            <h1 class="font-playfair text-4xl md:text-6xl font-bold text-green-800 mb-6">
+                Discover Your <span class="text-yellow-500">Magical</span> Leprechaun Name
+            </h1>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto mb-10">
+                Generate unique Irish-inspired names and download beautiful PDF certificates instantly.
+            </p>
+            <button onclick="generateName()" class="btn-primary text-lg">
+                <i class="fas fa-magic mr-2"></i> Generate My Name
+            </button>
+        </div>
+    </section>
+    <!-- Generator Section -->
+    <section id="generator" class="py-16 bg-white px-4">
+        <div class="container mx-auto max-w-4xl">
+            <h2 class="font-playfair text-3xl md:text-4xl font-bold text-green-800 mb-8 text-center">Generate Your Name</h2>
+            
+            <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-8 shadow-xl">
+                <div class="flex flex-col md:flex-row justify-between items-center mb-8">
+                    <div>
+                        <h3 class="text-2xl font-bold text-green-800 mb-2">Create & Download</h3>
+                        <p class="text-gray-600">Generate your magical name and download as PDF</p>
+                    </div>
+                    <div class="flex space-x-4 mt-4 md:mt-0">
+                        <button onclick="generateName()" id="generateBtn" class="btn-primary">
+                            <i class="fas fa-magic mr-2"></i> Generate
+                        </button>
+                        <button onclick="downloadPDF()" id="downloadBtn" class="btn-secondary" disabled>
+                            <i class="fas fa-download mr-2"></i> Download PDF
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="loadingSpinner" class="loading-spinner"></div>
+                
+                <div id="nameDisplay" class="name-display text-center">
+                    <div id="generatedName" class="font-playfair text-3xl md:text-4xl font-bold text-green-700 min-h-[60px]">
+                        Your name will appear here
+                    </div>
+                    <div id="nameMeaning" class="text-gray-600 mt-2 italic"></div>
+                </div>
+                
+                <div id="errorDisplay" class="hidden bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mt-4"></div>
+                
+                <!-- Name History -->
+                <div class="mt-8">
+                    <h4 class="text-lg font-semibold text-gray-700 mb-4">Recently Generated Names:</h4>
+                    <div id="nameHistory" class="space-y-2 max-h-40 overflow-y-auto p-2">
+                        <!-- History items will be added here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Features Section -->
+    <section id="features" class="py-16 bg-green-50 px-4">
+        <div class="container mx-auto">
+            <h2 class="font-playfair text-3xl md:text-4xl font-bold text-green-800 mb-12 text-center">Premium Features</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow duration-300">
+                    <i class="fas fa-file-pdf text-4xl text-green-600 mb-4"></i>
+                    <h3 class="text-xl font-bold text-green-800 mb-3">Beautiful PDFs</h3>
+                    <p class="text-gray-600">Download professional PDF certificates with multiple template designs.</p>
+                </div>
+                <div class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow duration-300">
+                    <i class="fas fa-infinity text-4xl text-green-600 mb-4"></i>
+                    <h3 class="text-xl font-bold text-green-800 mb-3">Unlimited Names</h3>
+                    <p class="text-gray-600">Generate as many unique leprechaun names as you want.</p>
+                </div>
+                <div class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow duration-300">
+                    <i class="fas fa-mobile-alt text-4xl text-green-600 mb-4"></i>
+                    <h3 class="text-xl font-bold text-green-800 mb-3">Mobile Friendly</h3>
+                    <p class="text-gray-600">Works perfectly on all devices - phones, tablets, and computers.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Templates Section -->
+    <section id="templates" class="py-16 bg-white px-4">
+        <div class="container mx-auto">
+            <h2 class="font-playfair text-3xl md:text-4xl font-bold text-green-800 mb-12 text-center">Beautiful Templates</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="text-center">
+                    <div class="bg-green-100 rounded-2xl p-8 mb-4">
+                        <i class="fas fa-gem text-5xl text-green-600"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-green-800 mb-2">Classic Emerald</h3>
+                    <p class="text-gray-600">Elegant green design with Celtic patterns</p>
+                </div>
+                <div class="text-center">
+                    <div class="bg-gradient-to-r from-red-100 to-purple-100 rounded-2xl p-8 mb-4">
+                        <i class="fas fa-rainbow text-5xl text-purple-600"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-purple-800 mb-2">Rainbow Magic</h3>
+                    <p class="text-gray-600">Colorful and vibrant rainbow theme</p>
+                </div>
+                <div class="text-center">
+                    <div class="bg-yellow-100 rounded-2xl p-8 mb-4">
+                        <i class="fas fa-coins text-5xl text-yellow-600"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-yellow-800 mb-2">Pot of Gold</h3>
+                    <p class="text-gray-600">Golden luxury style with shimmer effects</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Footer -->
+    <footer class="bg-green-800 text-white py-8 px-4">
+        <div class="container mx-auto text-center">
+            <div class="flex justify-center items-center space-x-2 mb-4">
+                <i class="fas fa-clover text-2xl text-yellow-300"></i>
+                <span class="font-playfair text-xl font-bold">LeprechaunGen</span>
+            </div>
+            <p class="text-green-200 mb-4">Generate magical leprechaun names instantly</p>
+            <div class="flex justify-center space-x-4 mb-4">
+                <a href="#" class="text-green-200 hover:text-yellow-300"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="text-green-200 hover:text-yellow-300"><i class="fab fa-facebook"></i></a>
+                <a href="#" class="text-green-200 hover:text-yellow-300"><i class="fab fa-instagram"></i></a>
+            </div>
+            <p class="text-green-300 text-sm">© 2026 Leprechaun Name Generator. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        let currentName = '';
+        let nameHistory = JSON.parse(localStorage.getItem('leprechaunNames') || '[]');
+        
+        function scrollToGenerator() {
+            document.getElementById('generator').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        async function generateName() {
+            const generateBtn = document.getElementById('generateBtn');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const nameDisplay = document.getElementById('generatedName');
+            const nameMeaning = document.getElementById('nameMeaning');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const errorDisplay = document.getElementById('errorDisplay');
+            
+            // Show loading
+            generateBtn.disabled = true;
+            generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Generating...';
+            loadingSpinner.style.display = 'block';
+            errorDisplay.classList.add('hidden');
+            
+            try {
+                const response = await fetch('/api/generate');
+                if (!response.ok) throw new Error(`API error: ${response.status}`);
+                const data = await response.json();
+                
+                currentName = data.name;
+                nameDisplay.textContent = currentName;
+                nameMeaning.textContent = data.meaning || 'A magical Irish name with deep meaning';
+                
+                // Enable download button
+                downloadBtn.disabled = false;
+                
+                // Add to history
+                addToHistory(currentName);
+                
+            } catch (error) {
+                console.error('Error generating name:', error);
+                errorDisplay.textContent = `Failed to generate name: ${error.message}. Please try again.`;
+                errorDisplay.classList.remove('hidden');
+                nameDisplay.textContent = 'Error generating name';
+                nameMeaning.textContent = '';
+            } finally {
+                // Reset UI
+                generateBtn.disabled = false;
+                generateBtn.innerHTML = '<i class="fas fa-magic mr-2"></i> Generate';
+                loadingSpinner.style.display = 'none';
+            }
+        }
+        
+        function addToHistory(name) {
+            const timestamp = new Date().toLocaleTimeString();
+            nameHistory.unshift({ name, timestamp });
+            if (nameHistory.length > 10) nameHistory = nameHistory.slice(0, 10);
+            localStorage.setItem('leprechaunNames', JSON.stringify(nameHistory));
+            updateHistoryDisplay();
+        }
+        
+        function updateHistoryDisplay() {
+            const historyContainer = document.getElementById('nameHistory');
+            historyContainer.innerHTML = '';
+            
+            nameHistory.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'bg-green-50 border border-green-100 rounded-lg p-3 flex justify-between items-center';
+                div.innerHTML = `
+                    <span class="font-medium text-green-800">${item.name}</span>
+                    <span class="text-sm text-gray-500">${item.timestamp}</span>
+                `;
+                historyContainer.appendChild(div);
+            });
+            
+            if (nameHistory.length === 0) {
+                historyContainer.innerHTML = '<p class="text-gray-500 italic text-center py-4">No names generated yet</p>';
+            }
+        }
+        
+        function downloadPDF() {
+            if (!currentName) {
+                alert('Please generate a name first!');
+                return;
+            }
+            
+            const encodedName = encodeURIComponent(currentName);
+            window.open(`/api/download-pdf?name=${encodedName}`, '_blank');
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateHistoryDisplay();
+            // Generate a name on first load
+            setTimeout(generateName, 500);
+        });
+    </script>
+</body>
+</html>

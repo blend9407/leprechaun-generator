@@ -1,0 +1,14 @@
+=== HERO SECTION ===
+$(grep -A 10 "<section.*hero" index.html | head -15)
+
+=== GENERATOR SECTION ===
+$(grep -A 10 "<section.*generator" index.html | head -15)
+
+=== FEATURES SECTION ===
+$(grep -A 5 "<section.*features" index.html | head -10)
+
+=== TEMPLATES SECTION ===
+$(grep -A 5 "<section.*templates" index.html | head -10)
+
+=== FOOTER ===
+$(grep -A 5 "<footer" index.html | head -10)

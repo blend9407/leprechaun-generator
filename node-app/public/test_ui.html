@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>UI Functionality Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        button { padding: 10px 20px; margin: 10px; background: #2e8b57; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        .result { margin: 20px; padding: 15px; border: 1px solid #ccc; background: #f9f9f9; }
+    </style>
+</head>
+<body>
+    <h1>UI Functionality Test</h1>
+    
+    <div>
+        <button onclick="testGenerate()">Test Generate API</button>
+        <button onclick="testDownload()">Test Download API</button>
+        <button onclick="testLocalStorage()">Test Local Storage</button>
+    </div>
+    
+    <div id="results" class="result">Results will appear here...</div>
+    
+    <script>
+        async function testGenerate() {
+            const results = document.getElementById('results');
+            results.innerHTML = 'Testing generate API...';
+            
+            try {
+                const response = await fetch('/api/generate');
+                const data = await response.json();
+                results.innerHTML = `✅ Generate API works!<br>Name: <strong>${data.name}</strong>`;
+            } catch (error) {
+                results.innerHTML = `❌ Generate API failed: ${error.message}`;
+            }
+        }
+        
+        async function testDownload() {
+            const results = document.getElementById('results');
+            results.innerHTML = 'Testing download API...';
+            
+            try {
+                const response = await fetch('/api/download-pdf?name=Test%20Leprechaun');
+                if (response.ok) {
+                    results.innerHTML = '✅ Download API works! (PDF should download)';
+                } else {
+                    results.innerHTML = `❌ Download API failed: ${response.status}`;
+                }
+            } catch (error) {
+                results.innerHTML = `❌ Download API failed: ${error.message}`;
+            }
+        }
+        
+        function testLocalStorage() {
+            const results = document.getElementById('results');
+            
+            try {
+                // Test localStorage
+                localStorage.setItem('test', 'value');
+                const retrieved = localStorage.getItem('test');
+                localStorage.removeItem('test');
+                
+                if (retrieved === 'value') {
+                    results.innerHTML = '✅ LocalStorage works correctly!';
+                } else {
+                    results.innerHTML = '❌ LocalStorage test failed';
+                }
+            } catch (error) {
+                results.innerHTML = `❌ LocalStorage not available: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Leprechaun Name Generator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; padding: 20px; background: #f0f8ff; }
+    h1 { color: #2e8b57; }
+    button { background: #2e8b57; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin: 10px; }
+    button:hover { background: #3cb371; }
+    .name { font-size: 24px; font-weight: bold; color: #228b22; margin: 20px; }
+    a { color: #2e8b57; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <h1>🍀 Leprechaun Name Generator</h1>
+  <p>Generate your unique leprechaun name and download as PDF!</p>
+  <button onclick="generateName()">Generate Name</button>
+  <button onclick="downloadPDF()">Download PDF</button>
+  <div id="nameDisplay" class="name"></div>
+  <script>
+    let currentName = '';
+    async function generateName() {
+      const response = await fetch('/api/generate');
+      const data = await response.json();
+      currentName = data.name;
+      document.getElementById('nameDisplay').innerText = currentName;
+    }
+    function downloadPDF() {
+      if (!currentName) {
+        alert('Please generate a name first!');
+        return;
+      }
+      window.open(`/api/download-pdf?name=${encodeURIComponent(currentName)}`, '_blank');
+    }
+    // Generate a name on page load
+    window.onload = generateName;
+  </script>
+</body>
+</html>
